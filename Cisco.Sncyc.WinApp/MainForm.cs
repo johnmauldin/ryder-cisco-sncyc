@@ -21,7 +21,7 @@ namespace Cisco.Sncyc.WinApp
         ICiscoSnCycEngine _engine = null;
         string _serialNo = string.Empty;
 
-        int _qty = 0;
+        int _qty;
 
         MCustH _customer;
         MLoc _location;
