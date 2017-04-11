@@ -40,6 +40,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CLoc.cs" />
+    <Compile Include="MOp.cs" />
+    <Compile Include="CProsMvt.cs" />
     <Compile Include="MItemH.cs" />
     <Compile Include="LRyderCiscoSncycCnt.cs" />
     <Compile Include="MCustH.cs" />
@@ -47,7 +49,9 @@
     <Compile Include="EFrtOrdD4.cs" />
     <Compile Include="MLoc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Query\RecountLRyderCiscoSncycCntParams.cs" />
     <Compile Include="Query\CLocParams.cs" />
+    <Compile Include="Query\CProsMvtParams.cs" />
     <Compile Include="Query\LRyderCiscoSncycCntParams.cs" />
     <Compile Include="Query\MCustHParams.cs" />
     <Compile Include="Query\EFrtOrdD4Params.cs" />

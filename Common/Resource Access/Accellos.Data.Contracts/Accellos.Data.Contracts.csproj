@@ -39,6 +39,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IRecountRyderCiscoSncycCnt.cs" />
+    <Compile Include="IMOpRepository.cs" />
+    <Compile Include="IArchiveRyderCiscoSncycCnt.cs" />
+    <Compile Include="ICProsMvtRepository.cs" />
     <Compile Include="ICLocRepository.cs" />
     <Compile Include="ILRyderCiscoSncycCntRepository.cs" />
     <Compile Include="IMItemHRepository.cs" />

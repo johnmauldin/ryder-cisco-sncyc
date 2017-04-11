@@ -9,6 +9,8 @@ namespace Accellos.Business.Contracts
 {
     public interface ICiscoSnCycEngine
     {
+        bool IsAdminUser(string user);
+
         MCustH GetCustomer(string custCode);
 
         MLoc GetLocation(string compCode, string locCode);
@@ -34,5 +36,9 @@ namespace Accellos.Business.Contracts
         bool AddSerialNo(MItemH item, MLoc location, string serialno, string itemType, string bulk, string userName);
 
         int GetScannedCount(string custCode, string locCode, string itemCode);
+
+        void ArchiveSerials();
+
+        void RescanSerials(string custCode, string locCode, string itemCode);
     }
 }

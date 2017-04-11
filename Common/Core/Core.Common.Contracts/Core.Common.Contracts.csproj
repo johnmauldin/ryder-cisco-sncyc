@@ -39,11 +39,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IBatchQueryFactory.cs" />
+    <Compile Include="IBatchQuery.cs" />
     <Compile Include="IDataRepositoryFactory.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="IAccountOwnedEntity.cs" />
     <Compile Include="IBusinessEngineFactory.cs" />
     <Compile Include="IDataRepository.cs" />
+    <Compile Include="IBatchQueryParams.cs" />
     <Compile Include="IReadOnlyRepository.cs" />
     <Compile Include="IReadOnlyRepositoryFactory.cs" />
     <Compile Include="IDirtyCapable.cs" />

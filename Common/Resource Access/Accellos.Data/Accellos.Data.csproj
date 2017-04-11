@@ -47,12 +47,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccellosContext.cs" />
+    <Compile Include="Batch\ArchiveRyderCiscoSncycCnt.cs" />
+    <Compile Include="BatchQueryFactory.cs" />
+    <Compile Include="Batch\RecountRyderCiscoSncycCnt.cs" />
     <Compile Include="DataRepositoryFactory.cs" />
     <Compile Include="DataRepositoryBase.cs" />
     <Compile Include="ReadOnlyRepositoryBase.cs" />
     <Compile Include="ReadOnlyRepositoryFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\CLocRepository.cs" />
+    <Compile Include="Repositories\MOpRepository.cs" />
+    <Compile Include="Repositories\CProsMvtRepository.cs" />
     <Compile Include="Repositories\LRyderCiscoSncycCntRepository.cs" />
     <Compile Include="Repositories\MItemHRepository.cs" />
     <Compile Include="Repositories\MCustHRepository.cs" />

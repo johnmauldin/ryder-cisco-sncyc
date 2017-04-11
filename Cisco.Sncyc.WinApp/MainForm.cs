@@ -1,5 +1,6 @@
 ﻿using Accellos.Business.Contracts;
 using Accellos.Business.Entities;
+using Accellos.Data.Contracts;
 using Core.Common.Core;
 using System;
 using System.Collections.Generic;
@@ -19,14 +20,14 @@ namespace Cisco.Sncyc.WinApp
     {
         [Import]
         ICiscoSnCycEngine _engine = null;
-        string _serialNo = string.Empty;
 
+        string _serialNo;
+        string _opcode;
         int _qty;
-
         MCustH _customer;
         MLoc _location;
         MItemH _item;
-        string _bulkItemFlag;
+        string _bulkItemFlag = "N";
         EntryMode _entryMode;
 
         enum EntryMode
@@ -37,14 +38,35 @@ namespace Cisco.Sncyc.WinApp
             BulkItem,
             ItemType,
             SerialNo,
+            AdminRescan,
             Finished
         }
 
-        string UserName { 
-            get 
+        public MainForm(string opcode)
+        {
+            InitializeComponent();
+            ObjectBase.Container.SatisfyImportsOnce(this);
+            _opcode = opcode;
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            
+            // this Archive could be split out to a job/scheduled task if neessary
+            try
             {
-                string name = WindowsIdentity.GetCurrent().Name;
-                return name.Substring(name.IndexOf("\\") + 1); } 
+                Cursor.Current = Cursors.WaitCursor;
+                _engine.ArchiveSerials();
+                Cursor.Current = Cursors.Default;
+            }
+            catch (Exception ex)
+            {
+                Cursor.Current = Cursors.Default;
+                showError(ex.Message);
+            }
+            
+
+            showCustomerPrompt();
         }
 
         MCustH SelectedCustomer
@@ -119,9 +141,14 @@ namespace Cisco.Sncyc.WinApp
                         this.lblProduct.Text = _item.ItemCode;
                         lblProduct.Visible = true;
                         showProductDetails();
-                        if (_entryMode != EntryMode.Finished) 
-                            
+
+                        if (_entryMode != EntryMode.Finished && 
+                            _entryMode != EntryMode.AdminRescan)     
                             showBulkItemPrompt();
+
+                        //if (_entryMode == EntryMode.AdminRescan)
+
+
                     }
                     else
                     {
@@ -178,18 +205,6 @@ namespace Cisco.Sncyc.WinApp
             }
         }
 
-        public MainForm()
-        {
-            ObjectBase.Container.SatisfyImportsOnce(this);
-
-            InitializeComponent();
-        }
-
-        private void MainForm_Load(object sender, EventArgs e)
-        {
-            showCustomerPrompt();
-        }
-
         string ScanValue { get { return txtScan.Text.ToUpper().TrimEnd(); } }
 
         private void txtScan_KeyPress(object sender, KeyPressEventArgs e)
@@ -198,6 +213,7 @@ namespace Cisco.Sncyc.WinApp
             {
                 if (Back()) return;
                 if (Bulk()) return;
+                if (Rescan()) return;
             }
         }
 
@@ -221,13 +237,18 @@ namespace Cisco.Sncyc.WinApp
 
                             try
                             {
+                                Cursor.Current = Cursors.WaitCursor;
+
                                 _engine.AddSerialNo(_item, _location,
-                                _serialNo, this.ItemType, this.BulkItemFlag, this.UserName);
+                                _serialNo, this.ItemType, this.BulkItemFlag, _opcode);
 
                                 addedSerialNo();
+
+                                Cursor.Current = Cursors.Default;
                             }
                             catch (Exception ex)
                             {
+                                Cursor.Current = Cursors.Default;
                                 showSerialNoPrompt();
                                 showError(ex.Message);
                             }
@@ -383,6 +404,16 @@ namespace Cisco.Sncyc.WinApp
             _entryMode = EntryMode.SerialNo;
             hideError();
         }
+
+        void showRescanPrompt()
+        {
+            txtScan.Text = "N";
+            txtScan.SelectAll();
+            lblScan.Text = "Re-scan? >>";
+            showWarning("All data for the item and location will be deleted.");
+            _entryMode = EntryMode.AdminRescan;
+        }
+
         #endregion
 
         #region private
@@ -401,9 +432,16 @@ namespace Cisco.Sncyc.WinApp
 
             if (cnt == _qty) // check if all items scanned
             {
-                finish();
-
-                return;
+                // allow admin to rescan a location
+                if (_engine.IsAdminUser(_opcode))
+                {
+                    showRescanPrompt();
+                }
+                else
+                {
+                    finish();
+                    return;
+                }
             }
 
             lblItemQty.Visible = true;
@@ -447,6 +485,13 @@ namespace Cisco.Sncyc.WinApp
             lblError.ForeColor = Color.Red;
         }
 
+        void showWarning(string msg)
+        {
+            lblError.Visible = true;
+            lblError.Text = msg;
+            lblError.ForeColor = Color.Yellow;
+        }
+        
         void hideError()
         {
             lblError.Visible = false;
@@ -491,11 +536,13 @@ namespace Cisco.Sncyc.WinApp
                         Application.Exit();
                         break;
                     case EntryMode.Finished:
+                    case EntryMode.AdminRescan:
                         _item = null;
                         _qty = 0;
                         //go back to the Product prompt but in a finished state
                         showProductPrompt();
                         break;
+                    
                     default:
                         return false;
                 }
@@ -520,5 +567,34 @@ namespace Cisco.Sncyc.WinApp
         }
         #endregion
 
+        bool Rescan()
+        {
+            if (this.ScanValue == "Y")
+            {
+                if (_entryMode == EntryMode.AdminRescan)
+                {
+                    try
+                    {
+                        _engine.RescanSerials(
+                            _customer.CustCode,
+                            _location.LocCode,
+                            _item.ItemCode
+                        );
+
+                        hideError();
+                        showBulkItemPrompt();
+                        tick();
+                    }
+                    catch (Exception ex)
+                    {
+                        showError(ex.Message);
+                        return false;
+                    }
+                    
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

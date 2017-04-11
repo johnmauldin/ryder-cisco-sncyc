@@ -22,15 +22,27 @@ namespace Cisco.Sncyc.Business.BusinessEngines
         [Import]
         private IDataRepositoryFactory _dataRepositoryFactory = null;
 
+        [Import]
+        private IBatchQueryFactory _batchQueryFactory = null;
+
         public CiscoSnCycEngine()
         {
 
         }
 
+        /// <summary>
+        /// Unit Testing hook
+        /// </summary>
+        /// <param name="readOnlyRepositoryFactory"></param>
         public CiscoSnCycEngine(IReadOnlyRepositoryFactory readOnlyRepositoryFactory)
          {
              _readOnlyRepositoryFactory = readOnlyRepositoryFactory;
          }
+
+        public bool IsAdminUser(string user)
+        {
+            return user.ToUpper() == "CISADM" || 1==1;
+        }
 
         public MCustH GetCustomer(string custCode)
         {
@@ -151,12 +163,38 @@ namespace Cisco.Sncyc.Business.BusinessEngines
                 .GetDataRepository<ILRyderCiscoSncycCntRepository>();
 
             return repo.GetSerialCount(custCode, locCode, itemCode);
-
         }
 
         public bool IsValidItemType(string itemType)
         {
             return (itemType.Equals("NB") || itemType.Equals("RF"));
+        }
+
+        public void ArchiveSerials()
+        {
+            var query = _batchQueryFactory.GetBatchQuery<IArchiveRyderCiscoSncycCnt>();
+
+            try
+            {
+                query.Execute();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public void RescanSerials(string custCode, string locCode, string itemCode)
+        {
+            var query = _batchQueryFactory.GetBatchQuery
+                <IRecountRyderCiscoSncycCnt>();
+
+            query.Execute(new RecountLRyderCiscoSncycCntParams 
+            { 
+                CustCode = custCode,
+                LocCode = locCode,
+                ItemCode = itemCode
+            });
         }
     }
 }

@@ -30,7 +30,16 @@ namespace Core.Common.DataAccess
             var cmd = new OracleCommand(sql, cn);
             foreach (var p in parameters) cmd.Parameters.Add(p);
 
-            return cmd.ExecuteNonQuery();
+            var result = cmd.ExecuteNonQuery();
+
+            cmd.Parameters.Clear();
+
+            return result;
+        }
+
+        public static int ExecuteSql(OracleTransaction tx, string sql, IList<OracleParameter> parameters)
+        {
+            return ExecuteSql(tx.Connection, sql, parameters);
         }
 
         public static void ExecuteReader(OracleConnection cn, string sql, 

@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cisco.Sncyc.WinApp", "Cisco.Sncyc.WinApp\Cisco.Sncyc.WinApp.csproj", "{5ABEB37B-BA52-4CFC-9D01-B7A9781EC393}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cisco.Sncyc", "Cisco.Sncyc\Cisco.Sncyc.csproj", "{7269019C-FBA8-46F8-ACD5-D19424CC1005}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{776C1A09-0272-457D-B05B-D1A6321AD356}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resource Access", "Resource Access", "{07BDD617-1C0F-421F-AC23-48EA2EDB6DF8}"
@@ -41,10 +39,6 @@ Global
 		{5ABEB37B-BA52-4CFC-9D01-B7A9781EC393}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5ABEB37B-BA52-4CFC-9D01-B7A9781EC393}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5ABEB37B-BA52-4CFC-9D01-B7A9781EC393}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7269019C-FBA8-46F8-ACD5-D19424CC1005}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7269019C-FBA8-46F8-ACD5-D19424CC1005}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7269019C-FBA8-46F8-ACD5-D19424CC1005}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7269019C-FBA8-46F8-ACD5-D19424CC1005}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6A540A58-B8DB-4195-A87F-DDE5D4D65679}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6A540A58-B8DB-4195-A87F-DDE5D4D65679}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A540A58-B8DB-4195-A87F-DDE5D4D65679}.Release|Any CPU.ActiveCfg = Release|Any CPU

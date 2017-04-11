@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace Accellos.Data.Contracts
 {
-    public interface ILRyderCiscoSncycCntRepository : IDataRepository<LRyderCiscoSncycCnt>
+    /// <summary>
+    /// Expresses behavior for querying the m_op table
+    /// </summary>
+    public interface IMOpRepository : IReadOnlyRepository<MOp, string>
     {
-        IList<LRyderCiscoSncycCnt> GetByExample(LRyderCiscoSncycCntParams example);
-
-        int GetSerialCount(string custCode, string locCode, string itemCode);
-
+        
     }
 }

@@ -17,6 +17,7 @@ namespace Accellos.Data.Repositories
     [PartCreationPolicy(CreationPolicy.NonShared)] //dont use Singleton, which is the default
     public class LRyderCiscoSncycCntRepository : DataRepositoryBase<LRyderCiscoSncycCnt, string>, ILRyderCiscoSncycCntRepository
     {
+        #region GetByExample
         public IList<LRyderCiscoSncycCnt> GetByExample(LRyderCiscoSncycCntParams example)
         {
             var ctx = new AccellosContext();
@@ -64,6 +65,7 @@ FROM l_ryder_cisco_sncyc_cnt  WHERE 1=1 ");
                 return entities;
             }
         }
+#endregion
 
         #region AddEntity
         protected override LRyderCiscoSncycCnt AddEntity(AccellosContext entityContext, LRyderCiscoSncycCnt entity)
@@ -154,5 +156,6 @@ WHERE cust_code = :1 AND loc_code = :2 AND item_code = :3";
 
             return entity;
         }
+
     }
 }
