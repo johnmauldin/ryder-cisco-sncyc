@@ -42,9 +42,9 @@
             this.label1.ForeColor = System.Drawing.Color.White;
             this.label1.Location = new System.Drawing.Point(0, 15);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(97, 25);
+            this.label1.Size = new System.Drawing.Size(57, 25);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Op Code";
+            this.label1.Text = "User";
             // 
             // txtOpCode
             // 
@@ -105,7 +105,6 @@
             this.Controls.Add(this.txtOpCode);
             this.Controls.Add(this.label1);
             this.Name = "LoginForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SnCyc Login";
             this.Load += new System.EventHandler(this.LoginForm_Load);
             this.ResumeLayout(false);

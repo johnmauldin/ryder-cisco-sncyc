@@ -14,6 +14,6 @@ namespace Accellos.Data.Contracts
     /// </summary>
     public interface IMCustHRepository : IReadOnlyRepository<MCustH, string>
     {
-        
+        IList<MCustH> GetByExample(MCustHParams example);
     }
 }

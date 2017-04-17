@@ -21,7 +21,7 @@ namespace Accellos.Business.Entities
 
         public bool IsCisco { get { 
             return CustCode == "CISCOSYS" || 
-                CustCode == "CISCOZB" || 1==1; 
+                CustCode == "CISCOZB"; 
         } 
         }
     }

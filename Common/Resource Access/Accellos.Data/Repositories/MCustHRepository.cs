@@ -37,7 +37,12 @@ namespace Accellos.Data.Repositories
                     sql.Append("AND cust_code = :1 ");
                     parameters.Add(new OracleParameter(":1", OracleDbType.Varchar2, example.CustCode, ParameterDirection.Input));
                 }
-                
+                if (!string.IsNullOrWhiteSpace(example.CompCode))
+                {
+                    sql.Append("AND comp_code = :2 ");
+                    parameters.Add(new OracleParameter(":2", OracleDbType.Varchar2, example.CompCode, ParameterDirection.Input));
+                }
+
                 IList<MCustH> entities = new List<MCustH>();
 
                 OracleManager.ExecuteReader(cn, sql.ToString(), parameters,

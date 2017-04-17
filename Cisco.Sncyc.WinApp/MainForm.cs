@@ -35,6 +35,7 @@ namespace Cisco.Sncyc.WinApp
             Customer,
             Location,
             Product,
+            ProductError,
             BulkItem,
             ItemType,
             SerialNo,
@@ -142,12 +143,15 @@ namespace Cisco.Sncyc.WinApp
                         lblProduct.Visible = true;
                         showProductDetails();
 
+                        if (_entryMode == EntryMode.ProductError)
+                        {
+                            _entryMode = EntryMode.Product;
+                            return; //cloc lookup likely failed
+                        }
+
                         if (_entryMode != EntryMode.Finished && 
                             _entryMode != EntryMode.AdminRescan)     
                             showBulkItemPrompt();
-
-                        //if (_entryMode == EntryMode.AdminRescan)
-
 
                     }
                     else
@@ -214,14 +218,22 @@ namespace Cisco.Sncyc.WinApp
                 if (Back()) return;
                 if (Bulk()) return;
                 if (Rescan()) return;
+
+                submit();
             }
         }
 
         #region txtScan_TextChanged
         private void txtScan_TextChanged(object sender, EventArgs e)
         {
-            
-            if (ScanValue.Length == 0) {
+           
+        }
+        #endregion
+
+        void submit()
+        {
+            if (ScanValue.Length == 0)
+            {
                 return;
             }
 
@@ -280,6 +292,8 @@ namespace Cisco.Sncyc.WinApp
 
                 try
                 {
+                    Cursor.Current = Cursors.WaitCursor;
+
                     if (this.SelectedCustomer == null)
                     {
                         this.SelectedCustomer = _engine.GetCustomer(ScanValue);
@@ -304,15 +318,19 @@ namespace Cisco.Sncyc.WinApp
                 {
                     showError(ex.Message);
                 }
+                finally
+                {
+                    Cursor.Current = Cursors.Default;
+                }
             }
-            
         }
-        #endregion
 
         #region show
 
         void showCustomerPrompt()
         {
+            _location = null;
+            _customer = null;
             setPromptWidth();
             pnlScan.Visible = true;
             txtScan.Focus();
@@ -329,12 +347,19 @@ namespace Cisco.Sncyc.WinApp
             lblScan.Text = "Location >>";
             lblLocation.Visible = false;
             lblItemQty.Visible = false;
+            _location = null;
+            _item = null;
+            _itemType = string.Empty;
+            _bulkItemFlag = string.Empty;
             _entryMode = EntryMode.Location;
         }
 
         void showProductPrompt()
         {
             _item = null; //reset the variable so next scan will take
+            _qty = 0;
+            _itemType = string.Empty;
+            _bulkItemFlag = string.Empty;
             setPromptWidth();
             txtScan.Clear(); // does this cause the TextChanged event?
             lblScan.Text = "Item >>";
@@ -376,20 +401,10 @@ namespace Cisco.Sncyc.WinApp
             catch (Exception ex)
             {
                 showError(ex.Message);
-                _item = null;
+                showProductPrompt();
+                _entryMode = EntryMode.ProductError;
             }
             
-        }
-
-        void refreshProductHeader()
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append(_item.ItemCode);
-            if (this.IsBulkItem)
-                sb.Append(" -B"); 
-            if (!string.IsNullOrEmpty(this.ItemType))
-                sb.Append(string.Format(" -{0}", this.ItemType));
-            lblProduct.Text = sb.ToString();
         }
 
         void showSerialNoPrompt()
@@ -397,7 +412,7 @@ namespace Cisco.Sncyc.WinApp
             _serialNo = string.Empty;
             _itemType = string.Empty;
             refreshProductHeader();
-            setPromptWidth(.6M);
+            setPromptWidth(.7M);
             txtScan.Clear();
             txtScan.Focus();
             lblScan.Text = "SerialNo >>";
@@ -410,7 +425,7 @@ namespace Cisco.Sncyc.WinApp
             txtScan.Text = "N";
             txtScan.SelectAll();
             lblScan.Text = "Re-scan? >>";
-            showWarning("All data for the item and location will be deleted.");
+            showWarning("All data for the location/item will be deleted.");
             _entryMode = EntryMode.AdminRescan;
         }
 
@@ -418,19 +433,33 @@ namespace Cisco.Sncyc.WinApp
 
         #region private
 
+        void refreshProductHeader()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(_item.ItemCode);
+            if (this.IsBulkItem)
+                sb.Append("   (B)");
+            if (!string.IsNullOrEmpty(this.ItemType))
+                sb.Append(string.Format(" -{0}", this.ItemType));
+            lblProduct.Text = sb.ToString();
+            lblProduct.Refresh();
+        }
+
         void addedSerialNo()
         {
             _serialNo = string.Empty;
             tick();
-            if (_entryMode != EntryMode.Finished) 
-                showSerialNoPrompt();
+
+            if (_entryMode != EntryMode.Finished &&
+                _entryMode != EntryMode.AdminRescan)
+                 showSerialNoPrompt();    
         }
 
         void tick()
         {
             int cnt = _engine.GetScannedCount(_item.CustCode, _location.LocCode, _item.ItemCode);
 
-            if (cnt == _qty) // check if all items scanned
+            if (cnt == _qty) // all items scanned check
             {
                 // allow admin to rescan a location
                 if (_engine.IsAdminUser(_opcode))
@@ -450,12 +479,13 @@ namespace Cisco.Sncyc.WinApp
 
         void finish()
         {
-            showError(string.Format("Item '{0}' already scanned", _item.ItemCode));
+            showError(string.Format("Item '{0}' scan completed", _item.ItemCode));
 
             switch (_entryMode)
             {
                 case EntryMode.Product:
                 case EntryMode.SerialNo:
+                case EntryMode.ItemType:
                 case EntryMode.Finished:
                     
                     _item = null;
@@ -470,7 +500,7 @@ namespace Cisco.Sncyc.WinApp
 
         void setPromptWidth()
         {
-            setPromptWidth(.4M);
+            setPromptWidth(.5M);
         }
 
         void setPromptWidth(decimal size)
@@ -500,7 +530,7 @@ namespace Cisco.Sncyc.WinApp
 
         #region Back
         /// <summary>
-        /// check for user initiated Back event
+        /// Controls the backwards navigation, user can go backwards from any step
         /// </summary>
         /// <returns></returns>
         bool Back()
@@ -512,34 +542,27 @@ namespace Cisco.Sncyc.WinApp
                 switch (_entryMode)
                 {
                     case EntryMode.SerialNo:
-                        _item = null;
-                        _itemType = string.Empty;
-                        _bulkItemFlag = string.Empty;
+                    case EntryMode.BulkItem:
+                    case EntryMode.ItemType:    
                         showProductPrompt();
                         break;
+
                     case EntryMode.Product:
-                    case EntryMode.ItemType:
-                        _item = null;
-                        _location = null;
-                        _itemType = string.Empty;
-                        _bulkItemFlag = string.Empty;
                         showLocationPrompt();
                         break;
+                    
                     case EntryMode.Location:
-                        _location = null;
-                        _customer = null;
                         showCustomerPrompt();
                         break;
+                    
                     case EntryMode.Customer:
                         _customer = null;
                         this.Close();
                         Application.Exit();
                         break;
+                    
                     case EntryMode.Finished:
                     case EntryMode.AdminRescan:
-                        _item = null;
-                        _qty = 0;
-                        //go back to the Product prompt but in a finished state
                         showProductPrompt();
                         break;
                     
@@ -548,6 +571,7 @@ namespace Cisco.Sncyc.WinApp
                 }
                 return true;
             }
+
             return false;
         }
         #endregion
@@ -567,12 +591,14 @@ namespace Cisco.Sncyc.WinApp
         }
         #endregion
 
+        #region Rescan
         bool Rescan()
         {
-            if (this.ScanValue == "Y")
+            if (_entryMode == EntryMode.AdminRescan)
             {
-                if (_entryMode == EntryMode.AdminRescan)
+                if (this.ScanValue == "Y")
                 {
+
                     try
                     {
                         _engine.RescanSerials(
@@ -590,11 +616,25 @@ namespace Cisco.Sncyc.WinApp
                         showError(ex.Message);
                         return false;
                     }
-                    
+
+                    return true;
+                }
+                else
+                {
+                    // user chooses not to re-scan, so prompt for another item
+                    hideError();
+                    showProductPrompt();
                     return true;
                 }
             }
             return false;
         }
+        #endregion
+
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit();
+        }
+
     }
 }

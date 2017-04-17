@@ -8,6 +8,9 @@ namespace Accellos.Business.Entities.Query
 {
     public class MCustHParams
     {
+
+        public string CompCode { get; set; }
+
         public string CustCode { get; set; }
     }
 }

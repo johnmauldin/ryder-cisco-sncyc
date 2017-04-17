@@ -90,11 +90,10 @@ WHERE loc_code = :1";
                 {
                     CompCode = reader.GetString(reader.GetOrdinal("comp_code")),
                     LocCode = reader.GetString(reader.GetOrdinal("loc_code")),
-                    LocDes = reader.GetString(reader.GetOrdinal("loc_des")),
+                    LocDes = reader.IsDBNull(reader.GetOrdinal("loc_des")) ? "" : reader.GetString(reader.GetOrdinal("loc_des")),
                     LocStat = reader.GetString(reader.GetOrdinal("loc_stat"))
                 };
 
-                //loc.SetId(guid.ToString());
                 return loc;
         }
 

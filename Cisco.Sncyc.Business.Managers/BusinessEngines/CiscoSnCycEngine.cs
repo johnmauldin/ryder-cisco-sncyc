@@ -47,7 +47,12 @@ namespace Cisco.Sncyc.Business.BusinessEngines
         public MCustH GetCustomer(string custCode)
         {
             var repo = _readOnlyRepositoryFactory.GetDataRepository<IMCustHRepository>();
-            return repo.Get(custCode);
+            var entities = repo.GetByExample(new MCustHParams 
+            { 
+                CompCode = "H2", 
+                CustCode = custCode 
+            });
+            return entities.FirstOrDefault();
         }
 
         public bool IsCustomerValid(MCustH customer)
