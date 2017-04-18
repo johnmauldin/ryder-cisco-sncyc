@@ -34,9 +34,13 @@ namespace Cisco.Sncyc.Business.BusinessEngines
         /// Unit Testing hook
         /// </summary>
         /// <param name="readOnlyRepositoryFactory"></param>
-        public CiscoSnCycEngine(IReadOnlyRepositoryFactory readOnlyRepositoryFactory)
+        public CiscoSnCycEngine(IReadOnlyRepositoryFactory readOnlyRepositoryFactory,
+            IDataRepositoryFactory dataRepositoryFactory,
+            IBatchQueryFactory batchQueryFactory)
          {
              _readOnlyRepositoryFactory = readOnlyRepositoryFactory;
+             _dataRepositoryFactory = dataRepositoryFactory;
+             _batchQueryFactory = batchQueryFactory;
          }
 
         public bool IsAdminUser(string user)
@@ -103,7 +107,13 @@ namespace Cisco.Sncyc.Business.BusinessEngines
 
         public bool IsProductValid(MItemH item)
         {
-            return (item != null && item.IsActive);
+            if (item == null || !item.IsActive)
+                return false;
+
+            if (!item.Serialized)
+                throw new Exception("Not a serialized item.");
+
+            return true;
         }
 
         public int GetCalculatedInventory(string compCode, string custCode, string locCode, string itemCode)

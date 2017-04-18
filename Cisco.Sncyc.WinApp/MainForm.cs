@@ -133,8 +133,20 @@ namespace Cisco.Sncyc.WinApp
             set
             {
                 _item = value;
+                bool valid;
 
-                if (_engine.IsProductValid(_item))
+                try
+                {
+                    valid = _engine.IsProductValid(_item);
+                }
+                catch (Exception ex)
+                {
+                    showProductPrompt();
+                    showError(ex.Message);
+                    return;
+                }
+                
+                if (valid)
                 {
                     if (_item.Serialized)
                     {

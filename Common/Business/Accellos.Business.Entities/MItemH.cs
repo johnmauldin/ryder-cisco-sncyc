@@ -24,6 +24,6 @@ namespace Accellos.Business.Entities
 
         public bool IsActive { get { return this.ItemStat == "A"; } } // not "D"
 
-        public bool Serialized { get { return this.ProsProfCode == "SN" || 1==1; } } 
+        public bool Serialized { get { return this.ProsProfCode.ToUpper() == "SN"; } } 
     }
 }
