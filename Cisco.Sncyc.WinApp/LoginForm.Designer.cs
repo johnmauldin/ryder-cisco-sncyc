@@ -106,6 +106,8 @@
             this.Controls.Add(this.label1);
             this.Name = "LoginForm";
             this.Text = "SnCyc Login";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.LoginForm_FormClosed);
             this.Load += new System.EventHandler(this.LoginForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

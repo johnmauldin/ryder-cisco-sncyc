@@ -31,6 +31,8 @@ namespace Accellos.Business.Contracts
 
         bool IsValidSerialNo(string sn);
 
+        bool SerialNoExists(string custCode, string locCode, string itemCode, string serialno);
+
         bool IsValidItemType(string itemType);
 
         bool AddSerialNo(MItemH item, MLoc location, string serialno, string itemType, string bulk, string userName);

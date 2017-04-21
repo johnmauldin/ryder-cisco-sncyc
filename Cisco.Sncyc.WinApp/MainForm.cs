@@ -70,6 +70,7 @@ namespace Cisco.Sncyc.WinApp
             showCustomerPrompt();
         }
 
+        #region Properties
         MCustH SelectedCustomer
         {
             get { return _customer; }
@@ -222,6 +223,7 @@ namespace Cisco.Sncyc.WinApp
         }
 
         string ScanValue { get { return txtScan.Text.ToUpper().TrimEnd(); } }
+        #endregion
 
         private void txtScan_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -238,7 +240,7 @@ namespace Cisco.Sncyc.WinApp
         #region txtScan_TextChanged
         private void txtScan_TextChanged(object sender, EventArgs e)
         {
-           
+            
         }
         #endregion
 
@@ -249,7 +251,7 @@ namespace Cisco.Sncyc.WinApp
                 return;
             }
 
-            if (ScanValue.Length > 1)
+            if (ScanValue.Length > 1) //when we require keypress [Enter] this length check is N/A
             {
                 switch (_entryMode)
                 {
@@ -289,8 +291,32 @@ namespace Cisco.Sncyc.WinApp
                         if (_engine.IsValidSerialNo(ScanValue))
                         {
                             _serialNo = this.ScanValue;
-                            hideError();
-                            showItemTypePrompt();
+
+                            try
+                            {
+                                Cursor.Current = Cursors.WaitCursor;
+
+                                var exists = _engine.SerialNoExists(this.SelectedCustomer.CustCode,
+                                    this.SelectedLocation.LocCode,
+                                    this.SelectedProduct.ItemCode,
+                                    _serialNo);
+
+                                if (exists)
+                                {
+                                    throw new InvalidOperationException(string.Format("{0} already scanned", _serialNo));
+                                }
+                                hideError();
+                                showItemTypePrompt();
+                            }
+                            catch (Exception ex)
+                            {
+                                showSerialNoPrompt();
+                                showError(ex.Message);
+                            }
+                            finally
+                            {
+                                Cursor.Current = Cursors.Default;
+                            }
                         }
                         else
                         {
@@ -374,7 +400,7 @@ namespace Cisco.Sncyc.WinApp
             _bulkItemFlag = string.Empty;
             setPromptWidth();
             txtScan.Clear(); // does this cause the TextChanged event?
-            lblScan.Text = "Item >>";
+            lblScan.Text = "ITEM >>";
             lblProduct.Visible = false;
             lblItemQty.Visible = false;
             _entryMode = EntryMode.Product;
@@ -385,7 +411,7 @@ namespace Cisco.Sncyc.WinApp
             setPromptWidth();
             txtScan.Text = "N";
             txtScan.SelectAll();
-            lblScan.Text = "Bulk? (y/n) >>";
+            lblScan.Text = "BULK? (y/n) >>";
             _entryMode = EntryMode.BulkItem;
         }
 
@@ -394,7 +420,7 @@ namespace Cisco.Sncyc.WinApp
             setPromptWidth();
             txtScan.Clear();
             txtScan.Focus();
-            lblScan.Text = "Item Type >>";
+            lblScan.Text = "RF/NB? >>";
             _entryMode = EntryMode.ItemType;
         }
 
@@ -427,7 +453,7 @@ namespace Cisco.Sncyc.WinApp
             setPromptWidth(.7M);
             txtScan.Clear();
             txtScan.Focus();
-            lblScan.Text = "SerialNo >>";
+            lblScan.Text = "SERIAL >>";
             _entryMode = EntryMode.SerialNo;
             hideError();
         }
@@ -517,7 +543,9 @@ namespace Cisco.Sncyc.WinApp
 
         void setPromptWidth(decimal size)
         {
-            txtScan.Width = (int)(pnlScan.Width * size);
+            txtScan.Width = pnlScan.Width - lblScan.Width;
+
+            //txtScan.Width = (int)(pnlScan.Width * size);
         }
 
         void showError(string msg)
@@ -620,7 +648,7 @@ namespace Cisco.Sncyc.WinApp
                         );
 
                         hideError();
-                        showBulkItemPrompt();
+                        showSerialNoPrompt();
                         tick();
                     }
                     catch (Exception ex)

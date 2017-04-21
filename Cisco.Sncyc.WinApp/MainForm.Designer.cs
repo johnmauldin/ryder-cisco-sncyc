@@ -66,10 +66,10 @@
             // 
             // txtScan
             // 
-            this.txtScan.Location = new System.Drawing.Point(157, 6);
+            this.txtScan.Location = new System.Drawing.Point(172, 6);
             this.txtScan.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtScan.Name = "txtScan";
-            this.txtScan.Size = new System.Drawing.Size(165, 31);
+            this.txtScan.Size = new System.Drawing.Size(274, 31);
             this.txtScan.TabIndex = 2;
             this.txtScan.TextChanged += new System.EventHandler(this.txtScan_TextChanged);
             this.txtScan.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtScan_KeyPress);
@@ -166,6 +166,7 @@
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "MainForm";
             this.Text = "Cisco SN Cyc";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.pnlScan.ResumeLayout(false);

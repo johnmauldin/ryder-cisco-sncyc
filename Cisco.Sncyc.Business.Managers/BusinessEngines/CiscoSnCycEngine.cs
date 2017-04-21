@@ -45,7 +45,7 @@ namespace Cisco.Sncyc.Business.BusinessEngines
 
         public bool IsAdminUser(string user)
         {
-            return user.ToUpper() == "CISADM" || 1==1;
+            return user.ToUpper() == "SJACKSON";
         }
 
         public MCustH GetCustomer(string custCode)
@@ -141,22 +141,30 @@ namespace Cisco.Sncyc.Business.BusinessEngines
             return false;
         }
 
+        public bool SerialNoExists(string custCode, string locCode, string itemCode, string serialno)
+        {
+            var repo = _dataRepositoryFactory
+                .GetDataRepository<ILRyderCiscoSncycCntRepository>();
+
+            var exists = repo.GetByExample(new LRyderCiscoSncycCntParams
+            {
+                CustCode = custCode,
+                LocCode = locCode,
+                ItemCode = itemCode,
+                Serial = serialno
+            }).Count > 0;
+
+            //if (exists)
+              //  throw new InvalidOperationException(string.Format("{0} already scanned", serialno));
+
+            return exists;
+        }
+
         public bool AddSerialNo(MItemH item, MLoc location, string serialno, string itemType, string bulk, string userName)
         {
             var repo = _dataRepositoryFactory
                 .GetDataRepository<ILRyderCiscoSncycCntRepository>();
             
-            var exists = repo.GetByExample(new LRyderCiscoSncycCntParams
-            {
-                CustCode = item.CustCode,
-                LocCode = location.LocCode,
-                ItemCode = item.ItemCode,
-                Serial = serialno
-            }).Count > 0;
-
-            if (exists)
-                throw new InvalidOperationException(string.Format("{0} already scanned", serialno));
-
             var saved = repo.Add(new LRyderCiscoSncycCnt
             {
                 CustCode = item.CustCode,
