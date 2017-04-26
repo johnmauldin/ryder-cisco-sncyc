@@ -232,9 +232,20 @@ namespace Cisco.Sncyc.WinApp
                 if (Back()) return;
                 if (Bulk()) return;
                 if (Rescan()) return;
+            }
 
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == Keys.Tab)
+            {
+                if (Back()) return base.ProcessCmdKey(ref msg, keyData);
+                if (Bulk()) return base.ProcessCmdKey(ref msg, keyData);
+                if (Rescan()) return base.ProcessCmdKey(ref msg, keyData);
                 submit();
             }
+            return base.ProcessCmdKey(ref msg, keyData);
         }
 
         #region txtScan_TextChanged
@@ -647,8 +658,13 @@ namespace Cisco.Sncyc.WinApp
                             _item.ItemCode
                         );
 
+                        System.Diagnostics.Debug.WriteLine(_itemType);
+
                         hideError();
-                        showSerialNoPrompt();
+                        if (string.IsNullOrEmpty(BulkItemFlag))
+                            showBulkItemPrompt(); //this occurs if admin user just entered the Product
+                        else
+                            showSerialNoPrompt();
                         tick();
                     }
                     catch (Exception ex)

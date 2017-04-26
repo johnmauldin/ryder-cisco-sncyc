@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Accellos.Data.Contracts", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cisco.Sncyc.WebApp", "Cisco.Sncyc.WebApp\Cisco.Sncyc.WebApp.csproj", "{47A27914-4E22-4546-B7B3-4649922885B9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cisco.Sncyc.MaintService", "Cisco.Sncyc.MaintService\Cisco.Sncyc.MaintService.csproj", "{532863EB-098D-466D-827C-5FCA5A0886FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,10 @@ Global
 		{47A27914-4E22-4546-B7B3-4649922885B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47A27914-4E22-4546-B7B3-4649922885B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47A27914-4E22-4546-B7B3-4649922885B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{532863EB-098D-466D-827C-5FCA5A0886FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{532863EB-098D-466D-827C-5FCA5A0886FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{532863EB-098D-466D-827C-5FCA5A0886FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{532863EB-098D-466D-827C-5FCA5A0886FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

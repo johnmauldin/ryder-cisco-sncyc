@@ -61,7 +61,7 @@ WHERE op_code = :1";
             var entity = new MOp
                 {
                     OpCode = reader.GetString(reader.GetOrdinal("op_code")),
-                    CompCode = reader.GetString(reader.GetOrdinal("comp_code")),
+                    CompCode = reader.SafeGetString(reader.GetOrdinal("comp_code")),
                     OPPword = hex,
                     OpStat = reader.GetString(reader.GetOrdinal("op_stat"))
                 };
