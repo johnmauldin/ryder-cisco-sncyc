@@ -1,6 +1,7 @@
 ﻿using Accellos.Business.Contracts;
 using Accellos.Business.Entities;
 using Accellos.Data.Contracts;
+using Cisco.Sncyc.Business.BusinessEngines;
 using Core.Common.Core;
 using System;
 using System.Collections.Generic;
@@ -511,7 +512,7 @@ namespace Cisco.Sncyc.WinApp
             if (cnt == _qty) // all items scanned check
             {
                 // allow admin to rescan a location
-                if (_engine.IsAdminUser(_opcode))
+                if (CiscoSnCycEngine.IsAdminUser(_opcode))
                 {
                     showRescanPrompt();
                 }

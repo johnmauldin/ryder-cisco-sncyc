@@ -6,6 +6,7 @@ using Core.Common.Contracts;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -43,9 +44,11 @@ namespace Cisco.Sncyc.Business.BusinessEngines
              _batchQueryFactory = batchQueryFactory;
          }
 
-        public bool IsAdminUser(string user)
+        public static bool IsAdminUser(string user)
         {
-            return user.ToUpper() == "SJACKSON";
+            var setting = ConfigurationManager.AppSettings["adminUsers"];
+
+            return setting.ToLower().Split(',').Contains(user.ToLower());
         }
 
         public MCustH GetCustomer(string custCode)

@@ -6,6 +6,7 @@ using Core.Common.Contracts;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,7 +39,15 @@ namespace Cisco.Sncyc.Business.BusinessEngines
             if (user == null)
                 throw new ArgumentException("Invalid user");
 
+            if (CiscoSnCycEngine.IsAdminUser(opcode))
+            {
+                var setting = ConfigurationManager.AppSettings["adminPassword"];
+                if (password != setting)
+                    throw new ArgumentException("Invalid Password");
+            }
+
         }
+
 
     }
 }

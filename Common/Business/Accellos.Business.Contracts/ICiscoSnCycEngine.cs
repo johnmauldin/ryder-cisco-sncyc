@@ -9,7 +9,7 @@ namespace Accellos.Business.Contracts
 {
     public interface ICiscoSnCycEngine
     {
-        bool IsAdminUser(string user);
+        //bool IsAdminUser(string user);
 
         MCustH GetCustomer(string custCode);
 

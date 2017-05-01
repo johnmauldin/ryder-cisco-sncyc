@@ -50,6 +50,7 @@ namespace Cisco.Sncyc.WinApp
             {
                 lblError.Visible = true;
                 lblError.Text = ex.Message;
+                
             }
             finally
             {
