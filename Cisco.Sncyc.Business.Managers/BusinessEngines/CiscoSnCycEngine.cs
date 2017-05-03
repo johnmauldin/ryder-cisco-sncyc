@@ -46,9 +46,24 @@ namespace Cisco.Sncyc.Business.BusinessEngines
 
         public static bool IsAdminUser(string user)
         {
+#if (DEBUG)
+            return true;
+#endif        
             var setting = ConfigurationManager.AppSettings["adminUsers"];
 
             return setting.ToLower().Split(',').Contains(user.ToLower());
+        }
+
+        public string CleanProductCode(string prodCode)
+        {
+            var clean = string.Empty;
+
+            if (prodCode.StartsWith("1P"))
+                clean = prodCode.Substring(2);
+            else
+                clean = prodCode;
+
+            return clean;
         }
 
         public MCustH GetCustomer(string custCode)

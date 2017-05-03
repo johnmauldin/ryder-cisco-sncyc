@@ -358,7 +358,13 @@ namespace Cisco.Sncyc.WinApp
 
                     if (this.SelectedProduct == null)
                     {
-                        this.SelectedProduct = _engine.GetProduct(this.SelectedCustomer.CompCode, this.SelectedCustomer.CustCode, ScanValue);
+                        var prodCode =
+                        _engine.CleanProductCode(this.ScanValue);
+
+                        this.SelectedProduct = _engine.GetProduct(
+                            this.SelectedCustomer.CompCode, 
+                            this.SelectedCustomer.CustCode,
+                            prodCode);
                         return;
                     }
 
