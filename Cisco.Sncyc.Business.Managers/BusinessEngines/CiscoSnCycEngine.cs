@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -53,6 +54,115 @@ namespace Cisco.Sncyc.Business.BusinessEngines
 
             return setting.ToLower().Split(',').Contains(user.ToLower());
         }
+
+        #region GenerateLocSerialsMovedReport
+        public string GenerateLocSerialsMovedReport(string custCode, string locCode)
+        {
+            var repo = _dataRepositoryFactory
+                .GetDataRepository<ILRyderCiscoSncycCntRepository>();
+
+            var items = repo.GetScannedQtyMismatches("H2", custCode, locCode);
+
+            if (items.Count == 0)
+                throw new Exception("Location Serials Moved Report has no data");
+
+            var path = string.Format("{0}\\{1}_{2}.csv", 
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                "loc_serials_moved", DateTime.Now.ToString("yyyyMMddhhmm"));
+            
+            using (var fs = File.Create(path))
+            using (StreamWriter bw = new StreamWriter(fs))
+            {
+                bw.WriteLine("\"CustomerCode\",\"LocationCode\",\"ItemCode\",\"LocOnHandQty\",\"CycleCountQty\",\"Difference\"");
+                foreach (var item in items)
+                {
+                    bw.WriteLine(string.Format("\"{0}\",\"{1}\",\"{2}\",{3},{4},{5}", 
+                        item.CustomerCode, 
+                        item.LocationCode,
+                        item.ItemCode,
+                        item.LocOnHandQty,
+                        item.CycleCountQty,
+                        item.Difference));
+                }
+                
+                bw.Close();
+            }
+
+            return Path.GetFileName(path);
+        }
+        #endregion
+
+        #region GenerateLocsNotCountedReport
+        public string GenerateLocsNotCountedReport(string custCode)
+        {
+            var repo = _dataRepositoryFactory
+                .GetDataRepository<ILRyderCiscoSncycCntRepository>();
+
+            var items = repo.GetLocationsNotCounted("H2", custCode);
+
+            if (items.Count == 0)
+                throw new Exception("Locations Not Counted Report has no data");
+
+            var path = string.Format("{0}\\{1}_{2}.csv",
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                "locs_not_counted", DateTime.Now.ToString("yyyyMMddhhmm"));
+
+            using (var fs = File.Create(path))
+            using (StreamWriter bw = new StreamWriter(fs))
+            {
+                bw.WriteLine("\"CustomerCode\",\"LocationCode\",\"ItemCode\",\"LocOnHandQty\"");
+                foreach (var item in items)
+                {
+                    bw.WriteLine(string.Format("\"{0}\",\"{1}\",\"{2}\",{3}",
+                        item.CustomerCode,
+                        item.LocationCode,
+                        item.ItemCode,
+                        item.OnHandQty
+                        )
+                    );
+                }
+                bw.Close();
+            }
+
+            return Path.GetFileName(path);
+        }
+        #endregion
+
+        #region GenerateLocsCountedReport
+        public string GenerateLocsCountedReport(string custCode)
+        {
+            var repo = _dataRepositoryFactory
+                .GetDataRepository<ILRyderCiscoSncycCntRepository>();
+
+            var items = repo.GetLocationsCounted("H2", custCode);
+
+            if (items.Count == 0)
+                throw new Exception("Locations Counted Report has no data");
+
+            var path = string.Format("{0}\\{1}_{2}.csv",
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                "locs_counted", DateTime.Now.ToString("yyyyMMddhhmm"));
+
+            using (var fs = File.Create(path))
+            using (StreamWriter bw = new StreamWriter(fs))
+            {
+                bw.WriteLine("\"CustomerCode\",\"LocationCode\",\"ItemCode\",\"SerialCount\"");
+                foreach (var item in items)
+                {
+                    bw.WriteLine(string.Format("\"{0}\",\"{1}\",\"{2}\",{3}",
+                        item.CustomerCode,
+                        item.LocationCode,
+                        item.ItemCode,
+                        item.SerialCount
+                        )
+                    );
+                }
+                bw.Close();
+            }
+
+            return Path.GetFileName(path);
+        }
+        #endregion
 
         public string CleanProductCode(string prodCode)
         {
@@ -213,15 +323,21 @@ namespace Cisco.Sncyc.Business.BusinessEngines
 
         public void ArchiveSerials()
         {
+            if (ConfigurationManager.AppSettings["archiveSerials"] == "0")
+                return;
+
             var query = _batchQueryFactory.GetBatchQuery<IArchiveRyderCiscoSncycCnt>();
 
             try
             {
+                int days;
+                int.TryParse(ConfigurationManager.AppSettings["archiveSerialsDays"], out days);
+                query.Days = days;
                 query.Execute();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 

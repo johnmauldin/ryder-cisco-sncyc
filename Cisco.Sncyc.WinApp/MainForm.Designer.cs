@@ -38,6 +38,8 @@
             this.lblProduct = new System.Windows.Forms.Label();
             this.lblLocation = new System.Windows.Forms.Label();
             this.lblCustomer = new System.Windows.Forms.Label();
+            this.txtReport = new System.Windows.Forms.TextBox();
+            this.lblReport = new System.Windows.Forms.Label();
             this.pnlScan.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -153,12 +155,35 @@
             this.lblCustomer.Text = "Cust";
             this.lblCustomer.Visible = false;
             // 
+            // txtReport
+            // 
+            this.txtReport.Location = new System.Drawing.Point(414, 181);
+            this.txtReport.Name = "txtReport";
+            this.txtReport.Size = new System.Drawing.Size(44, 31);
+            this.txtReport.TabIndex = 12;
+            this.txtReport.Visible = false;
+            this.txtReport.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtReport_KeyPress);
+            // 
+            // lblReport
+            // 
+            this.lblReport.AutoSize = true;
+            this.lblReport.ForeColor = System.Drawing.Color.White;
+            this.lblReport.Location = new System.Drawing.Point(302, 184);
+            this.lblReport.Name = "lblReport";
+            this.lblReport.Size = new System.Drawing.Size(106, 25);
+            this.lblReport.TabIndex = 13;
+            this.lblReport.Text = "Report >>";
+            this.lblReport.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.lblReport.Visible = false;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(473, 375);
+            this.Controls.Add(this.lblReport);
+            this.Controls.Add(this.txtReport);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.lblScanCount);
             this.Controls.Add(this.lblError);
@@ -190,6 +215,8 @@
         private System.Windows.Forms.Label lblLocation;
         private System.Windows.Forms.Label lblCustomer;
         private System.Windows.Forms.Label lblItemQty;
+        private System.Windows.Forms.TextBox txtReport;
+        private System.Windows.Forms.Label lblReport;
     }
 }
 

@@ -54,11 +54,11 @@ namespace Cisco.Sncyc.WinApp
         private void MainForm_Load(object sender, EventArgs e)
         {
             
-            // this Archive could be split out to a job/scheduled task if neessary
+            // this Archive was split out to a job/scheduled task (see Cisco.Sncyc.MaintService)
             try
             {
                 Cursor.Current = Cursors.WaitCursor;
-                _engine.ArchiveSerials();
+                //_engine.ArchiveSerials();
                 Cursor.Current = Cursors.Default;
             }
             catch (Exception ex)
@@ -67,7 +67,6 @@ namespace Cisco.Sncyc.WinApp
                 showError(ex.Message);
             }
             
-
             showCustomerPrompt();
         }
 
@@ -78,7 +77,9 @@ namespace Cisco.Sncyc.WinApp
             set 
             { 
                 _customer = value;
-                
+
+                showReportPrompt(false);
+
                 if (_engine.IsCustomerValid(_customer))
                 {
                     hideError();
@@ -105,6 +106,8 @@ namespace Cisco.Sncyc.WinApp
 
                 if (_engine.IsLocationValid(_location))
                 {
+                    showReportPrompt(true);
+
                     if (!_engine.IsLocationCounted(_location.LocCode))
                     {
                         hideError();
@@ -125,6 +128,7 @@ namespace Cisco.Sncyc.WinApp
                     showError(string.Format("Location '{0}' Invalid", txtScan.Text));
                     txtScan.SelectAll();
                     _location = null;
+                    showReportPrompt(false);
                 }
 
                 
@@ -245,6 +249,7 @@ namespace Cisco.Sncyc.WinApp
                 if (Bulk()) return base.ProcessCmdKey(ref msg, keyData);
                 if (Rescan()) return base.ProcessCmdKey(ref msg, keyData);
                 submit();
+                return true;
             }
             return base.ProcessCmdKey(ref msg, keyData);
         }
@@ -400,6 +405,7 @@ namespace Cisco.Sncyc.WinApp
         {
             setPromptWidth();
             txtScan.Clear();
+            txtScan.Focus();
             lblScan.Text = "Location >>";
             lblLocation.Visible = false;
             lblItemQty.Visible = false;
@@ -417,6 +423,7 @@ namespace Cisco.Sncyc.WinApp
             _itemType = string.Empty;
             _bulkItemFlag = string.Empty;
             setPromptWidth();
+            txtScan.Focus();
             txtScan.Clear(); // does this cause the TextChanged event?
             lblScan.Text = "ITEM >>";
             lblProduct.Visible = false;
@@ -453,6 +460,7 @@ namespace Cisco.Sncyc.WinApp
                 _item.ItemCode);
 
                 tick();
+                txtScan.Focus();
             }
             catch (Exception ex)
             {
@@ -474,6 +482,7 @@ namespace Cisco.Sncyc.WinApp
             lblScan.Text = "SERIAL >>";
             _entryMode = EntryMode.SerialNo;
             hideError();
+            
         }
 
         void showRescanPrompt()
@@ -483,6 +492,7 @@ namespace Cisco.Sncyc.WinApp
             lblScan.Text = "Re-scan? >>";
             showWarning("All data for the location/item will be deleted.");
             _entryMode = EntryMode.AdminRescan;
+            txtScan.Focus();
         }
 
         #endregion
@@ -557,12 +567,13 @@ namespace Cisco.Sncyc.WinApp
         void setPromptWidth()
         {
             setPromptWidth(.5M);
+            
         }
 
         void setPromptWidth(decimal size)
         {
             txtScan.Width = pnlScan.Width - lblScan.Width;
-
+            
             //txtScan.Width = (int)(pnlScan.Width * size);
         }
 
@@ -699,5 +710,137 @@ namespace Cisco.Sncyc.WinApp
             Application.Exit();
         }
 
+        private void txtReport_KeyPress(object sender, KeyPressEventArgs e)
+        {
+
+            if (e.KeyChar == (char)Keys.Return)
+            {
+                hideError();
+    
+                switch (txtReport.Text.ToUpper())
+                {
+                    case "L1":
+                        try
+                        {
+                            Cursor.Current = Cursors.WaitCursor;
+
+                            Task t = Task.Factory.StartNew(() =>
+                            {
+                                return _engine.GenerateLocSerialsMovedReport(
+                                SelectedCustomer.CustCode,
+                                SelectedLocation.LocCode);
+                            })
+                            .ContinueWith((Success) =>
+                            {
+                                // callback when task is complete.
+                                MessageBox.Show(string.Format("{0} created", Success.Result), 
+                                "L2 Report",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                            }, TaskContinuationOptions.NotOnFaulted)
+                            .ContinueWith((Fail) =>
+                            {
+                                showError(Fail.Exception.Message);
+                            }, TaskContinuationOptions.OnlyOnFaulted);
+                        }
+                        catch (Exception ex)
+                        {
+                            showError(ex.Message);
+                        }
+                        finally
+                        {
+                            Cursor.Current = Cursors.Default;
+                        }
+                        break;
+
+                    case "L2":
+                        try
+                        {
+                            //Cursor.Current = Cursors.WaitCursor;
+ 
+                            Task t = Task.Factory.StartNew(() =>
+                            {
+                                // do your processing here - remember to call Invoke or BeginInvoke if
+                                // calling a UI object.
+                                return _engine.GenerateLocsNotCountedReport(
+                                SelectedCustomer.CustCode);
+                            })
+                            .ContinueWith((Success) =>
+                            {
+                                // callback when task is complete.
+                                MessageBox.Show(string.Format("{0} created", Success.Result), 
+                                "L2 Report",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                            }, TaskContinuationOptions.NotOnFaulted)
+                            .ContinueWith((Fail) =>
+                            {
+                                showError(Fail.Exception.Message);
+                            }, TaskContinuationOptions.OnlyOnFaulted);
+
+                            
+                        }
+                        catch (Exception ex)
+                        {
+                            showError(ex.Message);
+                        }
+                        finally
+                        {
+                            Cursor.Current = Cursors.Default;
+                        }
+                        break;
+
+                    case "L3":
+
+                        try
+                        {
+                            Task t = Task.Factory.StartNew(() =>
+                            {
+                                // do your processing here - remember to call Invoke or BeginInvoke if
+                                // calling a UI object.
+                                return _engine.GenerateLocsCountedReport(
+                                SelectedCustomer.CustCode);
+                            })
+                            .ContinueWith((Success) =>
+                            {
+                                // callback when task is complete.
+                                MessageBox.Show(string.Format("{0} created", Success.Result),
+                                "L3 Report",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                            }, TaskContinuationOptions.NotOnFaulted)
+                            .ContinueWith((Fail) =>
+                            {
+                                showError(Fail.Exception.Message);
+                            }, TaskContinuationOptions.OnlyOnFaulted);
+
+
+                        }
+                        catch (Exception ex)
+                        {
+                            showError(ex.Message);
+                        }
+                        finally
+                        {
+                            Cursor.Current = Cursors.Default;
+                        }
+                        break;
+
+                    default:
+                        showError("Invalid Report Code");
+                        break;
+                }                    
+            }
+        }
+
+        // Admins can run reports
+        void showReportPrompt(bool show)
+        {
+            if (CiscoSnCycEngine.IsAdminUser(_opcode))
+            {
+                txtReport.Visible = show;
+                lblReport.Visible = show;
+            }
+        }
     }
 }

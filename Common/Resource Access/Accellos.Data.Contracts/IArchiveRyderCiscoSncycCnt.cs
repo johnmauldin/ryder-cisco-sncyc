@@ -11,5 +11,6 @@ namespace Accellos.Data.Contracts
     public interface IArchiveRyderCiscoSncycCnt 
         : IBatchQuery
     {
+        int Days { get; set; }
     }
 }

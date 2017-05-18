@@ -15,5 +15,11 @@ namespace Accellos.Data.Contracts
 
         int GetSerialCount(string custCode, string locCode, string itemCode);
 
+        IList<ScannedQtyMismatchModel> GetScannedQtyMismatches(string compCode, string custCode, string locCode);
+
+        IList<LocationNotCountedModel> GetLocationsNotCounted(string compCode, string custCode);
+
+        IList<LocationCountedModel> GetLocationsCounted(string compCode, string custCode);
+        
     }
 }

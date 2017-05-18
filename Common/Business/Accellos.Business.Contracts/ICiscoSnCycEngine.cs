@@ -1,6 +1,7 @@
 ﻿using Accellos.Business.Entities;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,7 +10,12 @@ namespace Accellos.Business.Contracts
 {
     public interface ICiscoSnCycEngine
     {
-        
+        string GenerateLocSerialsMovedReport(string custCode, string locCode);
+
+        string GenerateLocsNotCountedReport(string custCode);
+
+        string GenerateLocsCountedReport(string custCode);
+
         string CleanProductCode(string prodCode);
 
         MCustH GetCustomer(string custCode);

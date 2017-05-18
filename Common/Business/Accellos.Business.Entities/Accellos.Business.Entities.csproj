@@ -40,6 +40,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CLoc.cs" />
+    <Compile Include="LocationCountedModel.cs" />
+    <Compile Include="LocationNotCountedModel.cs" />
+    <Compile Include="ScannedQtyMismatchModel.cs" />
     <Compile Include="MOp.cs" />
     <Compile Include="CProsMvt.cs" />
     <Compile Include="MItemH.cs" />
